@@ -41,6 +41,7 @@ export type Business = {
   slug: string;
   kind: "clinic" | "barber" | "lab" | "other";
   is_active: boolean;
+  is_listed: boolean;
 };
 
 export type QueueRow = {
@@ -58,4 +59,11 @@ export type ControlState = {
   queue: { id: string; name: string; is_open: boolean; avg_minutes: number };
   serving: (ControlTicket & { started_at: string }) | null;
   waiting: ControlTicket[];
+};
+
+export type DirectoryItem = {
+  name: string;
+  slug: string;
+  kind: "clinic" | "barber" | "lab" | "other";
+  queues_count: number;
 };

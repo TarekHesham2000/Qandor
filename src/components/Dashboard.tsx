@@ -34,7 +34,7 @@ export default function Dashboard() {
     const { data: sess } = await supabase.auth.getSession();
     if (!sess.session) return router.replace("/login");
     // الـ RLS بترجّع أنشطة المستخدم الحالي فقط، فمفيش فلتر owner_id هنا
-    const { data, error } = await supabase.from("businesses").select("id,name,slug,kind,is_active").order("created_at");
+    const { data, error } = await supabase.from("businesses").select("id,name,slug,kind,is_active,is_listed").order("created_at");
     if (error) setError(error.message);
     const list = (data ?? []) as Business[];
     setBusinesses(list);
@@ -107,6 +107,22 @@ export default function Dashboard() {
               <p className="text-xs text-slate-400">اطبع الـ QR وعلّقه في المحل، والعميل يمسحه ويحجز.</p>
             </div>
           </section>
+
+          <label className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+            <span>
+              <span className="block font-medium">يظهر في الصفحة الرئيسية</span>
+              <span className="text-xs text-slate-500">لو قفلته، الناس تحجز بالرابط أو الـ QR بس.</span>
+            </span>
+            <input
+              type="checkbox"
+              checked={current.is_listed}
+              onChange={async (e) => {
+                await getOwnerSupabase().from("businesses").update({ is_listed: e.target.checked }).eq("id", current.id);
+                loadBusinesses();
+              }}
+              className="h-5 w-5 accent-teal-600"
+            />
+          </label>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold">{WHO_LABEL[current.kind]}ين / الطوابير</h2>
@@ -183,6 +199,12 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
     await getOwnerSupabase().from("queues").update({ is_open: !q.is_open }).eq("id", q.id);
     onChanged();
   }
+  async function rename() {
+    const name = prompt("الاسم الجديد:", q.name)?.trim();
+    if (!name || name === q.name) return;
+    await getOwnerSupabase().from("queues").update({ name }).eq("id", q.id);
+    onChanged();
+  }
   async function remove() {
     if (!confirm(`حذف "${q.name}" وكل تذاكره؟`)) return;
     await getOwnerSupabase().from("queues").delete().eq("id", q.id);
@@ -203,6 +225,7 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
       <div className="mt-3 flex flex-wrap gap-2 text-sm">
         <a href={controlUrl} className="rounded-lg bg-teal-700 px-3 py-2 text-white">فتح صفحة التحكم</a>
         <button onClick={() => copy(controlUrl)} className="rounded-lg border border-teal-700 px-3 py-2 text-teal-700">نسخ لينك الحلاق</button>
+        <button onClick={rename} className="px-3 py-2 text-slate-600">تعديل الاسم</button>
         <button onClick={remove} className="px-3 py-2 text-red-600">حذف</button>
       </div>
     </div>
