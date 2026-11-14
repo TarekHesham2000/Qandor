@@ -33,3 +33,29 @@ export type QueueBroadcast = {
   waiting_nos: number[];
   avg_minutes: number;
 };
+
+// ---- صفحات صاحب النشاط ----
+export type Business = {
+  id: string;
+  name: string;
+  slug: string;
+  kind: "clinic" | "barber" | "lab" | "other";
+  is_active: boolean;
+};
+
+export type QueueRow = {
+  id: string;
+  business_id: string;
+  name: string;
+  is_open: boolean;
+  avg_service_minutes: number;
+  control_token: string;
+};
+
+export type ControlTicket = { id: string; ticket_no: number; name: string; phone: string };
+
+export type ControlState = {
+  queue: { id: string; name: string; is_open: boolean; avg_minutes: number };
+  serving: (ControlTicket & { started_at: string }) | null;
+  waiting: ControlTicket[];
+};

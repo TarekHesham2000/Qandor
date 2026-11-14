@@ -4,6 +4,7 @@ export default function Home() {
       <h1 className="text-4xl font-bold text-teal-700">قندور</h1>
       <p className="text-slate-600">دورك في الطابور على موبايلك، من غير زحمة ولا تطبيق.</p>
       <p className="text-sm text-slate-400">لو بتدوّر على دورك، افتح الرابط أو الـ QR اللي عند المحل.</p>
+      <a href="/login" className="mt-4 rounded-xl bg-teal-700 px-6 py-3 font-bold text-white">دخول صاحب العيادة / المحل</a>
     </main>
   );
 }
