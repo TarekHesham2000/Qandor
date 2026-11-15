@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
+import Logo from "@/components/brand/Logo";
+import SegDigits from "@/components/brand/SegDigits";
+import TicketCard, { type TicketPhase } from "@/components/ticket/TicketCard";
 import type { QueueBroadcast, TicketStatus } from "@/lib/types";
 
 // شبكة أمان: لو اتصال الـ Realtime وقع (موبايل/نت ضعيف) نسحب الحالة كل 20 ثانية
@@ -103,66 +106,58 @@ export default function TicketTracker({ token }: { token: string }) {
     refetch();
   }
 
-  if (state === "loading") return <p className="mt-20 text-center text-slate-500">جاري التحميل…</p>;
-  if (state === "notfound") return <p className="mt-20 text-center text-slate-500">التذكرة دي مش موجودة.</p>;
+  const shell = (children: React.ReactNode) => (
+    <div className="space-y-6">
+      <div className="flex justify-center"><Logo size={26} /></div>
+      {children}
+    </div>
+  );
+
+  if (state === "loading")
+    return shell(<div className="mx-auto h-[26rem] max-w-sm animate-pulse rounded-3xl bg-ink/10" aria-label="جاري التحميل" />);
+  if (state === "notfound")
+    return shell(
+      <div className="card mx-auto max-w-sm p-6 text-center">
+        <p className="font-display text-xl font-bold">التذكرة دي مش موجودة</p>
+        <p className="mt-2 text-ink/65">اتأكد إن الرابط كامل، أو احجز دور جديد من الرابط اللي عند المحل.</p>
+      </div>
+    );
   if (state === "error" || !ticket)
-    return (
-      <div className="mt-20 text-center">
-        <p className="text-slate-500">مش قادرين نوصل للسيرفر.</p>
-        <button onClick={refetch} className="mt-3 rounded-lg bg-teal-700 px-4 py-2 text-white">حاول تاني</button>
+    return shell(
+      <div className="card mx-auto max-w-sm p-6 text-center">
+        <p className="font-display text-xl font-bold">مش قادرين نوصل للسيرفر</p>
+        <p className="mt-2 text-ink/65">اتأكد من النت وجرّب تاني.</p>
+        <button onClick={refetch} className="btn btn-primary mt-4">حاول تاني</button>
       </div>
     );
 
-  const done = ticket.status === "done";
-  const skipped = ticket.status === "skipped";
-  const cancelled = ticket.status === "cancelled";
-  const serving = ticket.status === "serving";
   const waiting = ticket.status === "waiting";
+  const phase: TicketPhase = waiting ? (ticket.people_ahead <= 2 ? "soon" : "waiting") : ticket.status;
 
-  return (
-    <div className="space-y-5 text-center">
-      <header>
-        <p className="text-sm text-slate-500">{ticket.business_name} • {ticket.queue_name}</p>
-        <p className="mt-1 text-slate-600">أهلاً {ticket.customer_name}</p>
-      </header>
-
-      <section
-        className={`rounded-3xl p-8 shadow-sm ${
-          serving ? "animate-pulse bg-emerald-600 text-white" : "bg-white"
-        }`}
-        aria-live="polite"
-      >
-        <p className={serving ? "text-emerald-50" : "text-slate-500"}>رقم تذكرتك</p>
-        <p className="text-8xl font-black tabular-nums">{ticket.ticket_no}</p>
-        {serving && <p className="mt-2 text-2xl font-bold">دورك دلوقتي! ادخل 🎉</p>}
-        {done && <p className="mt-2 text-lg text-slate-600">تمت الخدمة. شكراً لك ✅</p>}
-        {skipped && <p className="mt-2 text-lg text-amber-700">اتخطّى دورك لأنك ما حضرتش. احجز تاني لو لسه محتاج.</p>}
-        {cancelled && <p className="mt-2 text-lg text-slate-600">تم إلغاء التذكرة.</p>}
-      </section>
+  return shell(
+    <div className="mx-auto max-w-sm space-y-5">
+      <TicketCard
+        phase={phase}
+        ticketNo={ticket.ticket_no}
+        ahead={ticket.people_ahead}
+        estMinutes={ticket.est_wait_minutes}
+        place={`${ticket.business_name} • ${ticket.queue_name}`}
+        customerName={ticket.customer_name}
+      />
 
       {waiting && (
-        <section className="grid grid-cols-3 gap-3">
-          <Stat label="الحالي" value={ticket.serving_no ?? "—"} />
-          <Stat label="قدامك" value={ticket.people_ahead} />
-          <Stat label="الوقت التقريبي" value={`${ticket.est_wait_minutes} د`} />
-        </section>
+        <div className="flex items-center justify-between rounded-xl bg-ink px-5 py-3 text-led">
+          <span className="text-sm text-white/65">الحالي عند الحلاق</span>
+          <span className="text-4xl"><SegDigits value={ticket.serving_no} digits={2} /></span>
+        </div>
       )}
 
       {waiting && (
-        <>
-          <p className="text-xs text-slate-400">الصفحة بتتحدث لوحدها. سيبها مفتوحة وهنطلّع صوت واهتزاز لما دورك يجي.</p>
-          <button onClick={cancel} className="text-sm text-red-600 underline">إلغاء دوري</button>
-        </>
+        <div className="space-y-2 text-center">
+          <p className="text-sm text-ink/55">الصفحة بتتحدث لوحدها. سيبها مفتوحة وهنطلّع صوت واهتزاز لما دورك يجي.</p>
+          <button onClick={cancel} className="text-sm font-medium text-red-600 underline underline-offset-4">إلغاء دوري</button>
+        </div>
       )}
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm">
-      <p className="text-2xl font-bold tabular-nums text-teal-800">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
   );
 }

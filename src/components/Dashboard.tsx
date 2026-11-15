@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
+import Logo from "@/components/brand/Logo";
 import { getOwnerSupabase } from "@/lib/supabase-owner";
 import type { Business, QueueRow } from "@/lib/types";
 
@@ -66,13 +67,13 @@ export default function Dashboard() {
     router.replace("/login");
   }
 
-  if (loading) return <p className="mt-20 text-center text-slate-500">جاري التحميل…</p>;
+  if (loading) return <p className="mt-20 text-center text-ink/55">جاري التحميل…</p>;
 
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-teal-700">لوحة التحكم</h1>
-        <button onClick={logout} className="text-sm text-slate-500 underline">خروج</button>
+        <Logo size={28} />
+        <button onClick={logout} className="text-sm text-ink/60 underline underline-offset-4">خروج</button>
       </header>
 
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
@@ -85,41 +86,41 @@ export default function Dashboard() {
             <select
               value={current.id}
               onChange={(e) => setCurrent(businesses.find((b) => b.id === e.target.value) ?? null)}
-              className="w-full rounded-xl border border-slate-200 bg-white p-3"
+              className="input"
             >
               {businesses.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
           )}
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-bold">{current.name}</h2>
-            <p className="text-sm text-slate-500">{KIND_LABEL[current.kind]}</p>
+          <section className="card p-5">
+            <h2 className="font-display text-2xl font-black">{current.name}</h2>
+            <p className="text-sm text-ink/55">{KIND_LABEL[current.kind]}</p>
             <div className="mt-4 flex flex-col items-center gap-3">
               {qr && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={qr} alt="QR للحجز" className="h-48 w-48" />
               )}
-              <p dir="ltr" className="break-all text-center text-sm text-slate-600">{origin}/b/{current.slug}</p>
+              <p dir="ltr" className="break-all text-center text-sm text-ink/60">{origin}/b/{current.slug}</p>
               <div className="flex gap-2">
-                <button onClick={() => copy(`${origin}/b/${current.slug}`)} className="rounded-lg bg-teal-700 px-4 py-2 text-sm text-white">نسخ رابط الحجز</button>
-                {qr && <a href={qr} download={`${current.slug}-qr.png`} className="rounded-lg border border-teal-700 px-4 py-2 text-sm text-teal-700">تحميل الـ QR</a>}
+                <button onClick={() => copy(`${origin}/b/${current.slug}`)} className="btn btn-primary px-4 py-2 text-sm">نسخ رابط الحجز</button>
+                {qr && <a href={qr} download={`${current.slug}-qr.png`} className="btn btn-ghost px-4 py-2 text-sm">تحميل الـ QR</a>}
               </div>
-              <p className="text-xs text-slate-400">اطبع الـ QR وعلّقه في المحل، والعميل يمسحه ويحجز.</p>
-              <div className="mt-1 flex gap-2 border-t border-slate-100 pt-3">
-                <a href={`/display/${current.slug}`} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-white">
+              <p className="text-xs text-ink/45">اطبع الـ QR وعلّقه في المحل، والعميل يمسحه ويحجز.</p>
+              <div className="mt-1 flex gap-2 border-t border-ink/10 pt-3">
+                <a href={`/display/${current.slug}`} target="_blank" rel="noreferrer" className="btn btn-ink px-4 py-2 text-sm">
                   📺 فتح شاشة العرض
                 </a>
-                <button onClick={() => copy(`${origin}/display/${current.slug}`)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700">
+                <button onClick={() => copy(`${origin}/display/${current.slug}`)} className="btn btn-ghost px-4 py-2 text-sm">
                   نسخ رابط الشاشة
                 </button>
               </div>
             </div>
           </section>
 
-          <label className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+          <label className="card flex items-center justify-between p-4">
             <span>
               <span className="block font-medium">يظهر في الصفحة الرئيسية</span>
-              <span className="text-xs text-slate-500">لو قفلته، الناس تحجز بالرابط أو الـ QR بس.</span>
+              <span className="text-xs text-ink/55">لو قفلته، الناس تحجز بالرابط أو الـ QR بس.</span>
             </span>
             <input
               type="checkbox"
@@ -128,12 +129,12 @@ export default function Dashboard() {
                 await getOwnerSupabase().from("businesses").update({ is_listed: e.target.checked }).eq("id", current.id);
                 loadBusinesses();
               }}
-              className="h-5 w-5 accent-teal-600"
+              className="h-5 w-5 accent-brand-600"
             />
           </label>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold">{WHO_LABEL[current.kind]}ين / الطوابير</h2>
+            <h2 className="font-display text-lg font-bold">{WHO_LABEL[current.kind]}ين / الطوابير</h2>
             {queues.map((q) => (
               <QueueCard key={q.id} q={q} origin={origin} onChanged={() => loadQueues(current.id)} />
             ))}
@@ -164,15 +165,15 @@ function CreateBusiness({ onCreated }: { onCreated: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-3 rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-bold">سجّل نشاطك</h2>
-      <input required minLength={2} value={name} onChange={(e) => setName(e.target.value)} placeholder="اسم المحل أو العيادة" className="w-full rounded-xl border border-slate-200 p-3" />
-      <input required dir="ltr" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="الرابط بالإنجليزي مثال: prince-salon" className="w-full rounded-xl border border-slate-200 p-3 text-right" />
-      <select value={kind} onChange={(e) => setKind(e.target.value as Business["kind"])} className="w-full rounded-xl border border-slate-200 p-3">
+    <form onSubmit={submit} className="card space-y-3 p-5">
+      <h2 className="font-display text-xl font-bold">سجّل نشاطك</h2>
+      <input required minLength={2} value={name} onChange={(e) => setName(e.target.value)} placeholder="اسم المحل أو العيادة" className="input" />
+      <input required dir="ltr" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="الرابط بالإنجليزي مثال: prince-salon" className="input text-right" />
+      <select value={kind} onChange={(e) => setKind(e.target.value as Business["kind"])} className="input">
         {Object.entries(KIND_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
       </select>
-      {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">إنشاء</button>
+      {error && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      <button disabled={busy} className="btn btn-primary w-full">إنشاء</button>
     </form>
   );
 }
@@ -193,8 +194,8 @@ function AddQueue({ businessId, label, onAdded }: { businessId: string; label: s
 
   return (
     <form onSubmit={submit} className="flex gap-2">
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder={`اسم ${label} جديد`} className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white p-3" />
-      <button disabled={busy} className="rounded-xl bg-teal-700 px-5 font-bold text-white disabled:opacity-50">إضافة</button>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder={`اسم ${label} جديد`} className="input min-w-0 flex-1" />
+      <button disabled={busy} className="btn btn-primary px-5">إضافة</button>
     </form>
   );
 }
@@ -226,23 +227,23 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
   }
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm">
+    <div className="card p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="font-bold">{q.name}</p>
-          <p className="text-xs text-slate-500">
+          <p className="font-display font-bold">{q.name}</p>
+          <p className="text-xs text-ink/55">
             متوسط الخدمة {Math.round(q.avg_service_minutes)} دقيقة • أقصى منتظرين {q.max_waiting}
           </p>
         </div>
-        <button onClick={toggle} className={`rounded-full px-3 py-1 text-sm ${q.is_open ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+        <button onClick={toggle} className={`rounded-full px-3 py-1 text-sm ${q.is_open ? "bg-emerald-100 text-emerald-800" : "bg-ink/10 text-ink/60"}`}>
           {q.is_open ? "مفتوح" : "مقفول"}
         </button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2 text-sm">
-        <a href={controlUrl} className="rounded-lg bg-teal-700 px-3 py-2 text-white">فتح صفحة التحكم</a>
-        <button onClick={() => copy(controlUrl)} className="rounded-lg border border-teal-700 px-3 py-2 text-teal-700">نسخ لينك الحلاق</button>
-        <button onClick={rename} className="px-3 py-2 text-slate-600">تعديل الاسم</button>
-        <button onClick={setMax} className="px-3 py-2 text-slate-600">الحد الأقصى</button>
+        <a href={controlUrl} className="btn btn-primary px-3 py-2">فتح صفحة التحكم</a>
+        <button onClick={() => copy(controlUrl)} className="btn btn-ghost px-3 py-2">نسخ لينك الحلاق</button>
+        <button onClick={rename} className="px-3 py-2 text-ink/65">تعديل الاسم</button>
+        <button onClick={setMax} className="px-3 py-2 text-ink/65">الحد الأقصى</button>
         <button onClick={remove} className="px-3 py-2 text-red-600">حذف</button>
       </div>
     </div>

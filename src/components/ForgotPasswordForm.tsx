@@ -26,10 +26,10 @@ export default function ForgotPasswordForm() {
   if (sent)
     return (
       <div className="space-y-3 text-center">
-        <p className="rounded-lg bg-emerald-50 p-4 text-emerald-800">
+        <p className="rounded-xl bg-emerald-50 p-4 text-emerald-800">
           لو الإيميل ده مسجل عندنا، هتوصلك رسالة فيها رابط تعيين الباسوورد. راجع الـ Spam كمان.
         </p>
-        <a href="/login" className="text-sm text-teal-700 underline">رجوع لتسجيل الدخول</a>
+        <a href="/login" className="text-sm font-medium text-brand-700 underline underline-offset-4">رجوع لتسجيل الدخول</a>
       </div>
     );
 
@@ -38,13 +38,13 @@ export default function ForgotPasswordForm() {
       <input
         required type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)}
         placeholder="الإيميل" autoComplete="email"
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-right outline-none focus:ring-2 focus:ring-teal-600"
+        className="input text-right"
       />
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      <button disabled={busy} className="btn btn-primary w-full">
         {busy ? "..." : "ابعتلي الرابط"}
       </button>
-      <a href="/login" className="block text-center text-sm text-slate-500 underline">رجوع</a>
+      <a href="/login" className="block text-center text-sm text-ink/55 underline underline-offset-4">رجوع</a>
     </form>
   );
 }

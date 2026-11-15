@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
+import Logo from "@/components/brand/Logo";
+import SegDigits from "@/components/brand/SegDigits";
 import { getSupabase } from "@/lib/supabase";
 import type { BoardData, QueueBroadcast } from "@/lib/types";
 
@@ -138,40 +140,50 @@ export default function DisplayBoard({ initial, slug }: { initial: BoardData; sl
 
   const n = board.queues.length;
   const cols = n <= 1 ? "grid-cols-1" : n === 2 ? "grid-cols-1 md:grid-cols-2" : n <= 4 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-3";
-  // حجم الرقم بيصغر كل ما الطوابير تزيد عشان يفضل واضح من بعيد
-  const numberSize = n <= 1 ? "text-[34vw]" : n <= 2 ? "text-[22vw] md:text-[18vw]" : "text-[16vw] md:text-[11vw]";
+  // الرقم بيصغر كل ما الطوابير تزيد. العرض بالـ vw والارتفاع محسوب من المساحة المتاحة (الشاشة ناقص الهيدر والفوتر)
+  // عشان الصفوف كلها تتحشر في شاشة التلفزيون من غير سكرول.
+  const colsNum = n <= 2 ? Math.max(n, 1) : n <= 4 ? 2 : 3;
+  const rows = Math.max(1, Math.ceil(n / colsNum));
+  const vw = n <= 1 ? 30 : n === 2 ? 17 : n <= 4 ? 13 : 8;
+  const size = `min(${vw}vw, calc((100dvh - 19rem) / ${rows} * 0.6))`;
+  const maxNo = Math.max(0, ...board.queues.map((q) => q.serving_no ?? 0));
+  const digits = Math.max(2, String(maxNo).length);
 
   return (
-    <main className="relative flex min-h-dvh flex-col bg-slate-900 p-4 text-white md:p-8">
+    <main className="relative flex h-dvh flex-col overflow-hidden bg-ink p-4 text-white md:p-8">
       {!started && (
         <button
           onClick={start}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-slate-900/95 text-center"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/95 px-6 text-center"
         >
-          <span className="text-5xl font-black text-teal-400">{board.name}</span>
-          <span className="rounded-2xl bg-teal-600 px-10 py-5 text-3xl font-bold">ابدأ الشاشة 🔊</span>
-          <span className="text-sm text-slate-400">اضغط مرة واحدة لتفعيل الصوت وملء الشاشة</span>
+          <Logo size={44} light />
+          <span className="font-display text-4xl font-black md:text-6xl">{board.name}</span>
+          <span className="btn btn-led px-10 py-5 text-2xl">ابدأ الشاشة</span>
+          <span className="text-sm text-white/55">اضغط مرة واحدة لتفعيل الصوت وملء الشاشة</span>
         </button>
       )}
 
-      <header className="mb-4 text-center">
-        <h1 className="text-3xl font-black text-teal-400 md:text-5xl">{board.name}</h1>
+      <header className="mb-4 flex items-center justify-between gap-4">
+        <h1 className="font-display text-2xl font-black md:text-4xl">{board.name}</h1>
+        <Logo size={28} light />
       </header>
 
-      <section className={`grid flex-1 gap-4 ${cols}`}>
+      <section className={`grid min-h-0 flex-1 auto-rows-fr gap-4 ${cols}`}>
         {board.queues.map((q) => {
           const flashing = flashId === q.id;
           return (
             <div
               key={q.id}
-              className={`flex flex-col items-center justify-center rounded-3xl p-4 transition-colors ${
-                flashing ? "animate-pulse bg-emerald-600" : "bg-slate-800"
-              } ${q.is_open ? "" : "opacity-50"}`}
+              className={`flex flex-col items-center justify-center rounded-xl border p-4 text-led transition-colors duration-500 ${
+                flashing ? "border-led bg-led/10" : "border-white/10 bg-black/30"
+              } ${q.is_open ? "" : "opacity-45"}`}
             >
-              <p className="text-2xl font-bold md:text-4xl">{q.name}</p>
-              <p className={`font-black leading-none tabular-nums ${numberSize}`}>{q.serving_no ?? "—"}</p>
-              <p className="mt-2 text-lg text-slate-300 md:text-2xl">
-                {!q.is_open ? "مقفول" : q.waiting_count > 0 ? `المنتظرين: ${q.waiting_count}` : "لا يوجد منتظرين"}
+              <p className="font-display text-xl font-bold text-white md:text-3xl">{q.name}</p>
+              <div className="py-3 leading-none" style={{ fontSize: size }}>
+                <SegDigits value={q.serving_no} digits={digits} />
+              </div>
+              <p className="text-base text-white/65 md:text-2xl">
+                {flashing ? "ينادي الآن" : !q.is_open ? "مقفول" : q.waiting_count > 0 ? `المنتظرين: ${q.waiting_count}` : "لا يوجد منتظرين"}
               </p>
             </div>
           );
@@ -179,18 +191,18 @@ export default function DisplayBoard({ initial, slug }: { initial: BoardData; sl
       </section>
 
       <footer className="mt-4 flex items-end justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {qr && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qr} alt="QR للحجز" className="h-24 w-24 rounded-lg bg-white p-1 md:h-32 md:w-32" />
+            <img src={qr} alt="QR للحجز" className="h-24 w-24 rounded-lg bg-white p-1.5 md:h-32 md:w-32" />
           )}
-          <p className="max-w-[10rem] text-sm text-slate-300 md:text-lg">امسح الكود واحجز دورك من موبايلك</p>
+          <p className="max-w-[11rem] text-sm text-white/70 md:text-lg">امسح الكود واحجز دورك من موبايلك</p>
         </div>
         <div className="flex gap-2 text-xs opacity-40 hover:opacity-100">
-          <button onClick={() => setSpeech((s) => !s)} className="rounded-lg bg-slate-700 px-3 py-2">
-            {speech ? "🔊 النطق شغال" : "🔇 النطق متوقف"}
+          <button onClick={() => setSpeech((s) => !s)} className="rounded-lg bg-white/10 px-3 py-2">
+            {speech ? "النطق شغال" : "النطق متوقف"}
           </button>
-          <button onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})} className="rounded-lg bg-slate-700 px-3 py-2">
+          <button onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})} className="rounded-lg bg-white/10 px-3 py-2">
             ملء الشاشة
           </button>
         </div>

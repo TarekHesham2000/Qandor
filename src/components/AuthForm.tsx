@@ -43,25 +43,25 @@ export default function AuthForm() {
       <input
         required type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)}
         placeholder="الإيميل" autoComplete="email"
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-right outline-none focus:ring-2 focus:ring-teal-600"
+        className="input text-right"
       />
       <input
         required type="password" dir="ltr" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
         placeholder="الباسوورد" autoComplete={mode === "login" ? "current-password" : "new-password"}
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-right outline-none focus:ring-2 focus:ring-teal-600"
+        className="input text-right"
       />
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      {info && <p className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">{info}</p>}
-      <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      {info && <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">{info}</p>}
+      <button disabled={busy} className="btn btn-primary w-full">
         {busy ? "..." : mode === "login" ? "دخول" : "إنشاء حساب"}
       </button>
       {mode === "login" && (
-        <a href="/forgot-password" className="block text-center text-sm text-slate-500 underline">نسيت الباسوورد؟</a>
+        <a href="/forgot-password" className="block text-center text-sm text-ink/55 underline underline-offset-4">نسيت الباسوورد؟</a>
       )}
       <button
         type="button"
         onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); setInfo(null); }}
-        className="w-full text-sm text-teal-700 underline"
+        className="w-full text-sm font-medium text-brand-700 underline underline-offset-4"
       >
         {mode === "login" ? "معنديش حساب — إنشاء حساب جديد" : "عندي حساب — تسجيل دخول"}
       </button>

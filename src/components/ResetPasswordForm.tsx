@@ -43,26 +43,26 @@ export default function ResetPasswordForm() {
   if (phase === "invalid")
     return (
       <div className="space-y-3 text-center">
-        <p className="rounded-lg bg-red-50 p-4 text-red-700">الرابط منتهي أو غير صالح.</p>
-        <a href="/forgot-password" className="text-sm text-teal-700 underline">اطلب رابط جديد</a>
+        <p className="rounded-xl bg-red-50 p-4 text-red-700">الرابط منتهي أو غير صالح.</p>
+        <a href="/forgot-password" className="text-sm font-medium text-brand-700 underline underline-offset-4">اطلب رابط جديد</a>
       </div>
     );
-  if (phase === "done") return <p className="rounded-lg bg-emerald-50 p-4 text-center text-emerald-800">تم تغيير الباسوورد ✅</p>;
+  if (phase === "done") return <p className="rounded-xl bg-emerald-50 p-4 text-center text-emerald-800">تم تغيير الباسوورد ✅</p>;
 
   return (
     <form onSubmit={submit} className="space-y-3">
       <input
         required type="password" dir="ltr" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
         placeholder="الباسوورد الجديد" autoComplete="new-password"
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-right outline-none focus:ring-2 focus:ring-teal-600"
+        className="input text-right"
       />
       <input
         required type="password" dir="ltr" minLength={6} value={confirm} onChange={(e) => setConfirm(e.target.value)}
         placeholder="تأكيد الباسوورد" autoComplete="new-password"
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-right outline-none focus:ring-2 focus:ring-teal-600"
+        className="input text-right"
       />
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      <button disabled={busy} className="btn btn-primary w-full">
         {busy ? "..." : "حفظ الباسوورد"}
       </button>
     </form>

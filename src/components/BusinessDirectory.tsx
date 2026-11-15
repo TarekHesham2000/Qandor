@@ -28,7 +28,7 @@ export default function BusinessDirectory({ items }: { items: DirectoryItem[] })
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="ابحث باسم العيادة أو الصالون"
-        className="w-full rounded-xl border border-slate-200 bg-white p-3 outline-none focus:ring-2 focus:ring-teal-600"
+        className="input"
       />
       <div className="flex gap-2 overflow-x-auto pb-1">
         {KINDS.map((k) => (
@@ -36,7 +36,7 @@ export default function BusinessDirectory({ items }: { items: DirectoryItem[] })
             key={k.key}
             onClick={() => setKind(k.key)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-sm ${
-              kind === k.key ? "bg-teal-700 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200"
+              kind === k.key ? "bg-ink text-white" : "bg-white text-ink/70 ring-1 ring-ink/15 hover:ring-ink/30"
             }`}
           >
             {k.label}
@@ -54,13 +54,13 @@ export default function BusinessDirectory({ items }: { items: DirectoryItem[] })
             <li key={b.slug}>
               <a
                 href={`/b/${b.slug}`}
-                className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm transition active:scale-[0.99]"
+                className="card flex items-center justify-between p-4 transition hover:shadow-md"
               >
                 <span className="flex items-center gap-3">
                   <span className="text-2xl" aria-hidden>{ICON[b.kind]}</span>
-                  <span className="font-semibold">{b.name}</span>
+                  <span className="font-display font-bold">{b.name}</span>
                 </span>
-                <span className="text-sm font-medium text-teal-700">احجز ←</span>
+                <span className="text-sm font-medium text-brand-600">احجز ←</span>
               </a>
             </li>
           ))}

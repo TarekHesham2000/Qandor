@@ -1,5 +1,116 @@
 @import "tailwindcss";
 
-/* خط عربي نظيف من النظام: صفر طلبات شبكة إضافية = تحميل أسرع على موبايل العميل */
-:root { --font-ar: "Segoe UI", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif; }
-body { font-family: var(--font-ar); }
+/*
+  هوية قندور: تذكرة الدور الورق + شاشة الأرقام الـ LED.
+  الألوان والخطوط معرّفة هنا مرة واحدة وكل الصفحات بتستخدمها.
+*/
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-display: "Noto Kufi Arabic Variable", "IBM Plex Sans Arabic", system-ui, sans-serif;
+
+  --color-ink: #0e1726;
+  --color-paper: #f4f5f7;
+  --color-led: #ffb224;
+
+  /* كوبالت: لون الأفعال (أزرار، روابط، حالة "منتظر") */
+  --color-brand-50: #eef1ff;
+  --color-brand-100: #e0e6ff;
+  --color-brand-200: #c7d0ff;
+  --color-brand-300: #a3b1ff;
+  --color-brand-400: #7c8bff;
+  --color-brand-500: #5565f5;
+  --color-brand-600: #3b4ce8;
+  --color-brand-700: #2f3ccb;
+  --color-brand-800: #2931a3;
+  --color-brand-900: #262f82;
+  --color-brand-950: #181d4d;
+
+  --animate-led-tick: led-tick 0.45s steps(2, end);
+  --animate-dot-in: dot-in 0.35s ease-out;
+  --animate-ring: ring 1.6s ease-out infinite;
+}
+
+@keyframes led-tick {
+  0% { opacity: 0.15; }
+  40% { opacity: 1; }
+  55% { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+@keyframes dot-in {
+  from { transform: scale(0.2); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 rgb(22 163 74 / 0.55); }
+  100% { box-shadow: 0 0 0 28px rgb(22 163 74 / 0); }
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 1;
+  }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
+  :focus-visible { outline: 2px solid var(--color-brand-600); outline-offset: 2px; }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    border-radius: 0.75rem; padding: 0.8rem 1.25rem; font-weight: 600; line-height: 1.2;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+    cursor: pointer;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: var(--color-brand-600); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--color-brand-700); }
+  .btn-ink { background: var(--color-ink); color: #fff; }
+  .btn-ink:hover:not(:disabled) { background: #1b2740; }
+  .btn-ghost { border: 1px solid rgb(14 23 38 / 0.18); color: var(--color-ink); background: transparent; }
+  .btn-ghost:hover:not(:disabled) { background: #fff; border-color: rgb(14 23 38 / 0.3); }
+  .btn-led { background: var(--color-led); color: var(--color-ink); }
+  .btn-led:hover:not(:disabled) { background: #ffc24d; }
+
+  .input {
+    width: 100%; border-radius: 0.75rem; border: 1px solid #d5d9e0; background: #fff;
+    padding: 0.8rem 1rem; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input::placeholder { color: #8b93a3; }
+  .input:focus { outline: none; border-color: var(--color-brand-600); box-shadow: 0 0 0 3px rgb(59 76 232 / 0.18); }
+
+  .card { background: #fff; border-radius: 1rem; box-shadow: 0 1px 2px rgb(14 23 38 / 0.06), 0 0 0 1px rgb(14 23 38 / 0.05); }
+}
+
+/* وهج الـ LED: وهج لونه من currentColor عشان يشتغل بأي لون */
+.led-glow {
+  filter: drop-shadow(0 0 0.035em currentColor) drop-shadow(0 0 0.16em color-mix(in oklab, currentColor 55%, transparent));
+}
+
+/* تذكرة ورق: حواف جانبية مقطوعة بنصف دايرة (ثقب التذكرة) */
+.ticket-shape {
+  --notch: 14px;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 var(--cut, 68%), #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--cut, 68%), #0000 98%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 var(--cut, 68%), #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--cut, 68%), #0000 98%, #000) right / 51% 100% no-repeat;
+}
+
+.perforation {
+  background-image: linear-gradient(to left, rgb(14 23 38 / 0.28) 50%, transparent 0);
+  background-size: 10px 2px;
+  height: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

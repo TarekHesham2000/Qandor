@@ -1,12 +1,14 @@
 import AuthForm from "@/components/AuthForm";
+import Logo from "@/components/brand/Logo";
 
-export const metadata = { title: "دخول صاحب المحل — قندور" };
+export const metadata = { title: "دخول صاحب النشاط — قندور" };
 
 export default function LoginPage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center p-6">
-      <h1 className="mb-1 text-center text-3xl font-bold text-teal-700">قندور</h1>
-      <p className="mb-6 text-center text-sm text-slate-500">دخول صاحب العيادة أو المحل</p>
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-10">
+      <a href="/" aria-label="الصفحة الرئيسية" className="mb-8 self-start"><Logo /></a>
+      <h1 className="text-3xl font-black">دخول صاحب النشاط</h1>
+      <p className="mb-7 mt-2 text-ink/65">ادخل عشان تدير الطابور والحلاقين وشاشة الصالة.</p>
       <AuthForm />
     </main>
   );

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getOwnerSupabase } from "@/lib/supabase-owner";
+import SegDigits from "@/components/brand/SegDigits";
 import { toArabicError } from "@/lib/errors";
 import type { ControlState } from "@/lib/types";
 
@@ -79,35 +80,42 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
     refresh();
   }
 
-  if (error && !state) return <p className="mt-20 text-center text-red-600">{error}</p>;
-  if (!state) return <p className="mt-20 text-center text-slate-500">جاري التحميل…</p>;
+  if (error && !state)
+    return (
+      <div className="card mt-16 p-6 text-center">
+        <p className="font-display text-xl font-bold">{error}</p>
+        <p className="mt-2 text-ink/65">اطلب من صاحب المحل يبعتلك اللينك تاني.</p>
+      </div>
+    );
+  if (!state) return <p className="mt-20 text-center text-ink/55">جاري التحميل…</p>;
 
   const { serving, waiting, queue } = state;
   const hasNext = waiting.length > 0;
 
   return (
     <div className="space-y-4">
-      <header className="text-center">
-        <h1 className="text-xl font-bold text-teal-800">{queue.name}</h1>
-        <p className="text-xs text-slate-500">منتظرين: {waiting.length} • متوسط الخدمة {Math.round(queue.avg_minutes)} د</p>
+      <header className="flex items-end justify-between">
+        <h1 className="text-2xl font-black">{queue.name}</h1>
+        <p className="text-sm text-ink/55">متوسط الخدمة {Math.round(queue.avg_minutes)} د</p>
       </header>
 
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-2 text-center text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-2 text-center text-sm text-red-700">{error}</p>}
 
-      <section className="rounded-3xl bg-white p-6 text-center shadow-sm">
-        <p className="text-sm text-slate-500">الحالي</p>
+      {/* الحالي: بنفس شكل شاشة الصالة عشان الحلاق يشوف اللي العميل بيشوفه */}
+      <section className="rounded-xl bg-ink p-5 text-center text-white shadow-[0_14px_30px_-12px_rgba(14,23,38,0.5)]">
+        <p className="text-sm text-white/55">الحالي</p>
+        <div className="py-2 text-8xl text-led"><SegDigits value={serving?.ticket_no ?? null} digits={2} /></div>
         {serving ? (
           <>
-            <p className="text-7xl font-black tabular-nums text-emerald-600">{serving.ticket_no}</p>
-            <p className="mt-1 text-lg font-semibold">{serving.name}</p>
+            <p className="font-display text-xl font-bold">{serving.name}</p>
             {serving.phone ? (
-              <a dir="ltr" href={`tel:${serving.phone}`} className="text-sm text-teal-700 underline">{serving.phone}</a>
+              <a dir="ltr" href={`tel:${serving.phone}`} className="text-sm text-white/65 underline underline-offset-4">{serving.phone}</a>
             ) : (
-              <p className="text-xs text-slate-400">حضوري</p>
+              <p className="text-sm text-white/50">حضوري</p>
             )}
           </>
         ) : (
-          <p className="my-6 text-xl text-slate-400">مفيش حد دلوقتي</p>
+          <p className="text-white/55">مفيش حد دلوقتي</p>
         )}
       </section>
 
@@ -115,65 +123,56 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
         <button
           onClick={() => act("queue_next")}
           disabled={busy || (!serving && !hasNext)}
-          className="col-span-2 rounded-2xl bg-teal-700 p-5 text-xl font-bold text-white active:scale-95 disabled:opacity-40"
+          className="btn btn-primary col-span-2 py-5 text-xl"
         >
           {serving ? (hasNext ? "خلصت ← التالي" : "خلصت") : "نادي التالي"}
         </button>
-        <button
-          onClick={() => act("queue_skip")}
-          disabled={busy || !serving}
-          className="rounded-2xl bg-amber-500 p-5 font-bold text-white active:scale-95 disabled:opacity-40"
-        >
+        <button onClick={() => act("queue_skip")} disabled={busy || !serving} className="btn btn-led py-5 text-lg">
           تخطي
         </button>
       </div>
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
+      <section className="card p-4">
         <button
           onClick={() => { setShowAdd((v) => !v); setAddMsg(null); }}
-          className="w-full text-center font-bold text-teal-700"
+          className="w-full text-center font-semibold text-brand-700"
         >
           {showAdd ? "إخفاء" : "+ إضافة عميل (جه من غير موبايل)"}
         </button>
         {showAdd && (
           <form onSubmit={addWalkin} className="mt-3 space-y-2">
-            <input
-              value={wName} onChange={(e) => setWName(e.target.value)} maxLength={50}
-              placeholder="الاسم (اختياري)"
-              className="w-full rounded-xl border border-slate-200 p-3"
-            />
+            <input value={wName} onChange={(e) => setWName(e.target.value)} maxLength={50} placeholder="الاسم (اختياري)" className="input" />
             <input
               type="tel" inputMode="tel" dir="ltr" value={wPhone} onChange={(e) => setWPhone(e.target.value)}
-              placeholder="الموبايل (اختياري — للتنبيه)"
-              className="w-full rounded-xl border border-slate-200 p-3 text-right"
+              placeholder="الموبايل (اختياري، للتنبيه)" className="input text-right"
             />
-            <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
-              أضف للطابور
-            </button>
-            {addMsg && <p role="status" className="rounded-lg bg-slate-100 p-2 text-center text-sm">{addMsg}</p>}
+            <button disabled={busy} className="btn btn-ink w-full">أضف للطابور</button>
+            {addMsg && <p role="status" className="rounded-xl bg-paper p-2 text-center text-sm">{addMsg}</p>}
           </form>
         )}
       </section>
 
       <section className="space-y-2">
-        <h2 className="font-bold">المنتظرين</h2>
-        {waiting.length === 0 && <p className="text-sm text-slate-400">مفيش منتظرين.</p>}
+        <h2 className="flex items-baseline justify-between font-display text-lg font-bold">
+          المنتظرين <span className="text-sm font-medium text-ink/55">{waiting.length}</span>
+        </h2>
+        {waiting.length === 0 && <p className="text-sm text-ink/50">مفيش منتظرين.</p>}
         {waiting.map((t, i) => (
-          <div key={t.id} className="flex items-center justify-between rounded-xl bg-white p-3 shadow-sm">
+          <div key={t.id} className="card flex items-center justify-between p-3">
             <div className="flex items-center gap-3">
-              <span className="w-10 text-center text-2xl font-black tabular-nums text-teal-700">{t.ticket_no}</span>
+              <span className="w-11 text-center font-display text-2xl font-black tabular-nums text-brand-700">{t.ticket_no}</span>
               <div>
-                <p className="font-medium">{t.name}</p>
+                <p className="font-semibold">{t.name}</p>
                 {t.phone ? (
-                  <p dir="ltr" className="text-right text-xs text-slate-400">{t.phone}</p>
+                  <p dir="ltr" className="text-right text-xs text-ink/45">{t.phone}</p>
                 ) : (
-                  <p className="text-xs text-slate-400">حضوري</p>
+                  <p className="text-xs text-ink/45">حضوري</p>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              {i === 0 && <span className="rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal-700">الجاي</span>}
-              <button onClick={() => cancelTicket(t.id, t.name)} className="text-sm text-red-600">إلغاء</button>
+            <div className="flex items-center gap-3">
+              {i === 0 && <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">الجاي</span>}
+              <button onClick={() => cancelTicket(t.id, t.name)} className="text-sm font-medium text-red-600">إلغاء</button>
             </div>
           </div>
         ))}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import BookingForm from "@/components/BookingForm";
+import Logo from "@/components/brand/Logo";
 import type { PublicBusiness } from "@/lib/types";
 
 // الأرقام لحظية (عدد المنتظرين)، فمش هنخزّن الصفحة في الكاش
@@ -29,10 +30,11 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
   if (!business) notFound();
 
   return (
-    <main className="mx-auto max-w-md p-5">
-      <header className="mb-6 text-center">
-        <p className="text-sm text-slate-500">احجز دورك في</p>
-        <h1 className="text-2xl font-bold text-teal-800">{business.name}</h1>
+    <main className="mx-auto max-w-md px-5 pb-12 pt-6">
+      <a href="/" aria-label="الصفحة الرئيسية"><Logo size={24} /></a>
+      <header className="mb-8 mt-8">
+        <p className="text-ink/60">احجز دورك في</p>
+        <h1 className="mt-1 text-4xl font-black leading-tight">{business.name}</h1>
       </header>
       <BookingForm queues={business.queues} kind={business.kind} />
     </main>
