@@ -105,6 +105,14 @@ export default function Dashboard() {
                 {qr && <a href={qr} download={`${current.slug}-qr.png`} className="rounded-lg border border-teal-700 px-4 py-2 text-sm text-teal-700">تحميل الـ QR</a>}
               </div>
               <p className="text-xs text-slate-400">اطبع الـ QR وعلّقه في المحل، والعميل يمسحه ويحجز.</p>
+              <div className="mt-1 flex gap-2 border-t border-slate-100 pt-3">
+                <a href={`/display/${current.slug}`} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-white">
+                  📺 فتح شاشة العرض
+                </a>
+                <button onClick={() => copy(`${origin}/display/${current.slug}`)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700">
+                  نسخ رابط الشاشة
+                </button>
+              </div>
             </div>
           </section>
 

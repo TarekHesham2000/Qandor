@@ -68,3 +68,13 @@ export type DirectoryItem = {
   kind: "clinic" | "barber" | "lab" | "other";
   queues_count: number;
 };
+
+// ---- شاشة العرض ----
+export type BoardQueue = {
+  id: string;
+  name: string;
+  is_open: boolean;
+  serving_no: number | null;
+  waiting_count: number;
+};
+export type BoardData = { name: string; kind: Business["kind"]; queues: BoardQueue[] };
