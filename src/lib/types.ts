@@ -54,7 +54,7 @@ export type QueueRow = {
   max_waiting: number;
 };
 
-export type ControlTicket = { id: string; ticket_no: number; name: string; phone: string };
+export type ControlTicket = { id: string; ticket_no: number; name: string; phone: string | null; source: "online" | "walkin" };
 
 export type ControlState = {
   queue: { id: string; name: string; is_open: boolean; avg_minutes: number };

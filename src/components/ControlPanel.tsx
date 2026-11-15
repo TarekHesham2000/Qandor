@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getOwnerSupabase } from "@/lib/supabase-owner";
+import { toArabicError } from "@/lib/errors";
 import type { ControlState } from "@/lib/types";
 
 const POLL_MS = 15_000;
@@ -10,6 +11,10 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
   const [state, setState] = useState<ControlState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [wName, setWName] = useState("");
+  const [wPhone, setWPhone] = useState("");
+  const [addMsg, setAddMsg] = useState<string | null>(null);
   // قفل محلي ضد الضغط المزدوج (السيرفر كمان بيقفل الصف، دي طبقة إضافية للتجربة)
   const lock = useRef(false);
 
@@ -43,6 +48,31 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
     setBusy(false);
   }
 
+  async function addWalkin(e: React.FormEvent) {
+    e.preventDefault();
+    if (lock.current) return;
+    lock.current = true;
+    setBusy(true);
+    setAddMsg(null);
+    // الاسم والموبايل اختياريين: العميل الحضوري ممكن يكون من غير موبايل
+    const { data, error } = await getOwnerSupabase().rpc("queue_add_walkin", {
+      p_queue_id: queueId,
+      p_name: wName,
+      p_phone: wPhone,
+      p_control_token: token,
+    });
+    if (error) {
+      setAddMsg(toArabicError(error));
+    } else {
+      setAddMsg(data.already_exists ? `الرقم ده موجود بالفعل برقم ${data.ticket_no}` : `تمت الإضافة ✅ رقمه ${data.ticket_no}`);
+      setWName("");
+      setWPhone("");
+      await refresh();
+    }
+    lock.current = false;
+    setBusy(false);
+  }
+
   async function cancelTicket(id: string, name: string) {
     if (!confirm(`إلغاء تذكرة ${name}؟`)) return;
     await getOwnerSupabase().rpc("queue_cancel_ticket", { p_ticket_id: id, p_control_token: token });
@@ -70,7 +100,11 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
           <>
             <p className="text-7xl font-black tabular-nums text-emerald-600">{serving.ticket_no}</p>
             <p className="mt-1 text-lg font-semibold">{serving.name}</p>
-            <a dir="ltr" href={`tel:${serving.phone}`} className="text-sm text-teal-700 underline">{serving.phone}</a>
+            {serving.phone ? (
+              <a dir="ltr" href={`tel:${serving.phone}`} className="text-sm text-teal-700 underline">{serving.phone}</a>
+            ) : (
+              <p className="text-xs text-slate-400">حضوري</p>
+            )}
           </>
         ) : (
           <p className="my-6 text-xl text-slate-400">مفيش حد دلوقتي</p>
@@ -94,6 +128,33 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
         </button>
       </div>
 
+      <section className="rounded-2xl bg-white p-4 shadow-sm">
+        <button
+          onClick={() => { setShowAdd((v) => !v); setAddMsg(null); }}
+          className="w-full text-center font-bold text-teal-700"
+        >
+          {showAdd ? "إخفاء" : "+ إضافة عميل (جه من غير موبايل)"}
+        </button>
+        {showAdd && (
+          <form onSubmit={addWalkin} className="mt-3 space-y-2">
+            <input
+              value={wName} onChange={(e) => setWName(e.target.value)} maxLength={50}
+              placeholder="الاسم (اختياري)"
+              className="w-full rounded-xl border border-slate-200 p-3"
+            />
+            <input
+              type="tel" inputMode="tel" dir="ltr" value={wPhone} onChange={(e) => setWPhone(e.target.value)}
+              placeholder="الموبايل (اختياري — للتنبيه)"
+              className="w-full rounded-xl border border-slate-200 p-3 text-right"
+            />
+            <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
+              أضف للطابور
+            </button>
+            {addMsg && <p role="status" className="rounded-lg bg-slate-100 p-2 text-center text-sm">{addMsg}</p>}
+          </form>
+        )}
+      </section>
+
       <section className="space-y-2">
         <h2 className="font-bold">المنتظرين</h2>
         {waiting.length === 0 && <p className="text-sm text-slate-400">مفيش منتظرين.</p>}
@@ -103,7 +164,11 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
               <span className="w-10 text-center text-2xl font-black tabular-nums text-teal-700">{t.ticket_no}</span>
               <div>
                 <p className="font-medium">{t.name}</p>
-                <p dir="ltr" className="text-right text-xs text-slate-400">{t.phone}</p>
+                {t.phone ? (
+                  <p dir="ltr" className="text-right text-xs text-slate-400">{t.phone}</p>
+                ) : (
+                  <p className="text-xs text-slate-400">حضوري</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
