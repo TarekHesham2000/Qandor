@@ -55,6 +55,9 @@ export default function AuthForm() {
       <button disabled={busy} className="w-full rounded-xl bg-teal-700 p-3 font-bold text-white disabled:opacity-50">
         {busy ? "..." : mode === "login" ? "دخول" : "إنشاء حساب"}
       </button>
+      {mode === "login" && (
+        <a href="/forgot-password" className="block text-center text-sm text-slate-500 underline">نسيت الباسوورد؟</a>
+      )}
       <button
         type="button"
         onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); setInfo(null); }}

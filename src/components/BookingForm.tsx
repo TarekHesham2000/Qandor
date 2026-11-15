@@ -13,12 +13,14 @@ export default function BookingForm({ queues, kind }: { queues: PublicQueue[]; k
   const [queueId, setQueueId] = useState(queues.find((q) => q.is_open)?.id ?? "");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [trap, setTrap] = useState(""); // honeypot: خانة مخفية، البشر ما بيملوهاش والبوتات بتملاها
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (trap) return; // بوت: نتجاهل بصمت من غير ما نكشف الفخ
     startTransition(async () => {
       try {
         const { data, error } = await getSupabase().rpc("take_ticket", {
@@ -70,6 +72,16 @@ export default function BookingForm({ queues, kind }: { queues: PublicQueue[]; k
           </label>
         ))}
       </fieldset>
+
+      <input
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        value={trap}
+        onChange={(e) => setTrap(e.target.value)}
+        name="website"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
 
       <div className="space-y-3">
         <input

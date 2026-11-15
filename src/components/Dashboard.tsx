@@ -45,7 +45,7 @@ export default function Dashboard() {
   const loadQueues = useCallback(async (businessId: string) => {
     const { data, error } = await getOwnerSupabase()
       .from("queues")
-      .select("id,business_id,name,is_open,avg_service_minutes,control_token")
+      .select("id,business_id,name,is_open,avg_service_minutes,control_token,max_waiting")
       .eq("business_id", businessId)
       .order("sort_order")
       .order("created_at");
@@ -205,6 +205,12 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
     await getOwnerSupabase().from("queues").update({ name }).eq("id", q.id);
     onChanged();
   }
+  async function setMax() {
+    const v = Number(prompt("أقصى عدد منتظرين في نفس الوقت (1 - 500):", String(q.max_waiting)));
+    if (!Number.isInteger(v) || v < 1 || v > 500) return;
+    await getOwnerSupabase().from("queues").update({ max_waiting: v }).eq("id", q.id);
+    onChanged();
+  }
   async function remove() {
     if (!confirm(`حذف "${q.name}" وكل تذاكره؟`)) return;
     await getOwnerSupabase().from("queues").delete().eq("id", q.id);
@@ -216,7 +222,9 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
       <div className="flex items-center justify-between">
         <div>
           <p className="font-bold">{q.name}</p>
-          <p className="text-xs text-slate-500">متوسط الخدمة {Math.round(q.avg_service_minutes)} دقيقة</p>
+          <p className="text-xs text-slate-500">
+            متوسط الخدمة {Math.round(q.avg_service_minutes)} دقيقة • أقصى منتظرين {q.max_waiting}
+          </p>
         </div>
         <button onClick={toggle} className={`rounded-full px-3 py-1 text-sm ${q.is_open ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
           {q.is_open ? "مفتوح" : "مقفول"}
@@ -226,6 +234,7 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
         <a href={controlUrl} className="rounded-lg bg-teal-700 px-3 py-2 text-white">فتح صفحة التحكم</a>
         <button onClick={() => copy(controlUrl)} className="rounded-lg border border-teal-700 px-3 py-2 text-teal-700">نسخ لينك الحلاق</button>
         <button onClick={rename} className="px-3 py-2 text-slate-600">تعديل الاسم</button>
+        <button onClick={setMax} className="px-3 py-2 text-slate-600">الحد الأقصى</button>
         <button onClick={remove} className="px-3 py-2 text-red-600">حذف</button>
       </div>
     </div>

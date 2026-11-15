@@ -51,6 +51,7 @@ export type QueueRow = {
   is_open: boolean;
   avg_service_minutes: number;
   control_token: string;
+  max_waiting: number;
 };
 
 export type ControlTicket = { id: string; ticket_no: number; name: string; phone: string };
