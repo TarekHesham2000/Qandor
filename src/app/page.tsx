@@ -135,7 +135,7 @@ export default async function Home() {
 
         {/* ───────── الأنشطة المسجلة فعلاً ───────── */}
         <section id="directory" className="mx-auto max-w-xl scroll-mt-6 px-5 py-20">
-          <h2 className="text-center text-3xl font-extrabold leading-snug sm:text-4xl">أنشطة على قندور دلوقتي</h2>
+          <h2 className="text-center text-3xl font-extrabold leading-snug sm:text-4xl">أنشطة على راحتك دلوقتي</h2>
           <p className="mt-3 text-center text-ink/65">ابحث عن عيادتك أو صالونك واحجز دورك.</p>
           <div className="mt-8">
             <BusinessDirectory items={items} />
@@ -162,7 +162,7 @@ export default async function Home() {
 
       <footer className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-ink/55">
         <Logo size={26} />
-        <p>قندور. إدارة الدور للعيادات والصالونات.</p>
+        <p>راحتك. إدارة الدور للعيادات والصالونات.</p>
         <a href="/login" className="hover:text-ink">دخول صاحب النشاط</a>
       </footer>
     </div>

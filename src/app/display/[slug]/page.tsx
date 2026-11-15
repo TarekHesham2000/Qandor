@@ -4,7 +4,7 @@ import DisplayBoard from "@/components/DisplayBoard";
 import type { BoardData } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "شاشة العرض — قندور", robots: { index: false } };
+export const metadata = { title: "شاشة العرض — راحتك", robots: { index: false } };
 
 export default async function DisplayPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

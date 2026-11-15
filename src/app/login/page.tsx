@@ -1,7 +1,7 @@
 import AuthForm from "@/components/AuthForm";
 import Logo from "@/components/brand/Logo";
 
-export const metadata = { title: "دخول صاحب النشاط — قندور" };
+export const metadata = { title: "دخول صاحب النشاط — راحتك" };
 
 export default function LoginPage() {
   return (

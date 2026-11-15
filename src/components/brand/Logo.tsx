@@ -1,4 +1,4 @@
-// علامة قندور: تذكرة بنتوءين جانبيين ورقم "1" مضيء. الشكل نفسه بيحكي الفكرة.
+// علامة راحتك: تذكرة بنتوءين جانبيين ورقم "1" مضيء. الشكل نفسه بيحكي الفكرة.
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
@@ -20,7 +20,7 @@ export default function Logo({ size = 32, light = false }: { size?: number; ligh
   return (
     <span className="inline-flex items-center gap-2">
       <LogoMark size={size} />
-      <span className={`font-display text-xl font-extrabold leading-none ${light ? "text-white" : "text-ink"}`}>قندور</span>
+      <span className={`font-display text-xl font-extrabold leading-none ${light ? "text-white" : "text-ink"}`}>راحتك</span>
     </span>
   );
 }

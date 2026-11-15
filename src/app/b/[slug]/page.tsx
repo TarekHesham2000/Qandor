@@ -21,7 +21,7 @@ async function loadBusiness(slug: string): Promise<PublicBusiness | null> {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const b = await loadBusiness(slug).catch(() => null);
-  return { title: b ? `احجز دورك — ${b.name}` : "قندور" };
+  return { title: b ? `احجز دورك — ${b.name}` : "راحتك" };
 }
 
 export default async function BusinessPage({ params }: { params: Promise<{ slug: string }> }) {
