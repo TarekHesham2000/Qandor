@@ -25,6 +25,7 @@ export type TicketStatus = {
   people_ahead: number;
   avg_minutes: number;
   est_wait_minutes: number;
+  kind?: Business["kind"]; // لو get_ticket_status رجّعته يوم من الأيام، النص بيتبع نوع النشاط
 };
 
 /** الحمولة اللي بيبثها _broadcast_queue: أرقام فقط بدون بيانات شخصية */

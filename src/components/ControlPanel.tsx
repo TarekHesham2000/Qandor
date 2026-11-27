@@ -103,7 +103,7 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
 
       {error && <p role="alert" className="rounded-xl bg-red-50 p-2 text-center text-sm text-red-700">{error}</p>}
 
-      {/* الحالي: بنفس شكل شاشة الصالة عشان الحلاق يشوف اللي العميل بيشوفه */}
+      {/* الحالي: بنفس شكل شاشة الصالة عشان الموظف يشوف اللي العميل بيشوفه */}
       <section className="rounded-xl bg-ink p-5 text-center text-white shadow-[0_14px_30px_-12px_rgba(14,23,38,0.5)]">
         <p className="text-sm text-white/55">الحالي</p>
         <div className="py-2 text-8xl text-led"><SegDigits value={serving?.ticket_no ?? null} digits={2} /></div>

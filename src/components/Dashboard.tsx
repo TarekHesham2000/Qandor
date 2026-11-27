@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import Logo from "@/components/brand/Logo";
 import { getOwnerSupabase } from "@/lib/supabase-owner";
+import { whoFor, whoPluralFor } from "@/lib/who";
 import type { Business, QueueRow } from "@/lib/types";
 
 const KIND_LABEL: Record<Business["kind"], string> = { barber: "حلاق / صالون", clinic: "عيادة", lab: "معمل", other: "أخرى" };
@@ -134,9 +135,9 @@ export default function Dashboard() {
           </label>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-bold">{WHO_LABEL[current.kind]}ين / الطوابير</h2>
+            <h2 className="font-display text-lg font-bold">{whoPluralFor(current.kind)} / الطوابير</h2>
             {queues.map((q) => (
-              <QueueCard key={q.id} q={q} origin={origin} onChanged={() => loadQueues(current.id)} />
+              <QueueCard key={q.id} q={q} kind={current.kind} origin={origin} onChanged={() => loadQueues(current.id)} />
             ))}
             <AddQueue businessId={current.id} label={WHO_LABEL[current.kind]} onAdded={() => loadQueues(current.id)} />
           </section>
@@ -200,8 +201,8 @@ function AddQueue({ businessId, label, onAdded }: { businessId: string; label: s
   );
 }
 
-function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onChanged: () => void }) {
-  // لينك التحكم: الحلاق يفتحه على موبايله من غير حساب. التوكن هو المفتاح، فالرابط سري.
+function QueueCard({ q, kind, origin, onChanged }: { q: QueueRow; kind: Business["kind"]; origin: string; onChanged: () => void }) {
+  // لينك التحكم: الموظف يفتحه على موبايله من غير حساب. التوكن هو المفتاح، فالرابط سري.
   const controlUrl = `${origin}/control/${q.id}?k=${q.control_token}`;
 
   async function toggle() {
@@ -241,7 +242,7 @@ function QueueCard({ q, origin, onChanged }: { q: QueueRow; origin: string; onCh
       </div>
       <div className="mt-3 flex flex-wrap gap-2 text-sm">
         <a href={controlUrl} className="btn btn-primary px-3 py-2">فتح صفحة التحكم</a>
-        <button onClick={() => copy(controlUrl)} className="btn btn-ghost px-3 py-2">نسخ لينك الحلاق</button>
+        <button onClick={() => copy(controlUrl)} className="btn btn-ghost px-3 py-2">نسخ لينك {whoFor(kind)}</button>
         <button onClick={rename} className="px-3 py-2 text-ink/65">تعديل الاسم</button>
         <button onClick={setMax} className="px-3 py-2 text-ink/65">الحد الأقصى</button>
         <button onClick={remove} className="px-3 py-2 text-red-600">حذف</button>
