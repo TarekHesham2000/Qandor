@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
 import { toArabicError } from "@/lib/errors";
+import { COUNTRIES, DEFAULT_DIAL, buildPhone } from "@/lib/phone";
 import type { PublicQueue } from "@/lib/types";
 
 const KIND_LABEL = { clinic: "اختار الدكتور", barber: "اختار الحلاق", lab: "اختار القسم", other: "اختار الطابور" } as const;
@@ -12,6 +13,7 @@ export default function BookingForm({ queues, kind }: { queues: PublicQueue[]; k
   const router = useRouter();
   const [queueId, setQueueId] = useState(queues.find((q) => q.is_open)?.id ?? "");
   const [name, setName] = useState("");
+  const [dial, setDial] = useState(DEFAULT_DIAL);
   const [phone, setPhone] = useState("");
   const [trap, setTrap] = useState(""); // honeypot: خانة مخفية، البشر ما بيملوهاش والبوتات بتملاها
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function BookingForm({ queues, kind }: { queues: PublicQueue[]; k
         const { data, error } = await getSupabase().rpc("take_ticket", {
           p_queue_id: queueId,
           p_name: name,
-          p_phone: phone,
+          p_phone: buildPhone(dial, phone),
         });
         if (error) throw error;
         // الـ token السري في الرابط هو "مفتاح" التذكرة بدل تسجيل الدخول
@@ -100,10 +102,20 @@ export default function BookingForm({ queues, kind }: { queues: PublicQueue[]; k
         </label>
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium">رقم الموبايل</span>
-          <input
-            required type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)}
-            placeholder="01xxxxxxxxx" autoComplete="tel" className="input text-right"
-          />
+          <div dir="ltr" className="flex gap-2">
+            <select
+              value={dial} onChange={(e) => setDial(e.target.value)} aria-label="كود الدولة"
+              className="input w-auto shrink-0"
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.iso} value={c.dial}>{c.name} {c.dial}</option>
+              ))}
+            </select>
+            <input
+              required type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)}
+              placeholder="01xxxxxxxxx" autoComplete="tel" className="input min-w-0 flex-1 text-right"
+            />
+          </div>
         </label>
         <p className="text-sm text-ink/55">هنستخدم رقمك لتنبيهك بدورك بس. مش بيظهر لأي عميل تاني.</p>
       </div>
