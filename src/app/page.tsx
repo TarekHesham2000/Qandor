@@ -162,7 +162,7 @@ export default async function Home() {
 
       <footer className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-ink/55">
         <Logo size={26} />
-        <p>راحتك. إدارة الدور للعيادات والصالونات.</p>
+        <p>دوري. إدارة الدور للعيادات والصالونات.</p>
         <a href="/login" className="hover:text-ink">دخول صاحب النشاط</a>
       </footer>
     </div>

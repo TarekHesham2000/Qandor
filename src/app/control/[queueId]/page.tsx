@@ -1,6 +1,6 @@
 import ControlPanel from "@/components/ControlPanel";
 
-export const metadata = { title: "تحكم الطابور — راحتك", robots: { index: false } };
+export const metadata = { title: "تحكم الطابور — دوري", robots: { index: false } };
 
 export default async function ControlPage({
   params,

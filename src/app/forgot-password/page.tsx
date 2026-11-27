@@ -1,6 +1,6 @@
 import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 
-export const metadata = { title: "استرجاع الباسوورد — راحتك", robots: { index: false } };
+export const metadata = { title: "استرجاع الباسوورد — دوري", robots: { index: false } };
 
 export default function ForgotPasswordPage() {
   return (

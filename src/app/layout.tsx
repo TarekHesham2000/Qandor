@@ -8,7 +8,7 @@ import "@fontsource/ibm-plex-sans-arabic/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "راحتك — دورك بدون زحمة",
+  title: "دوري — دورك بدون زحمة",
   description: "تابع دورك في الطابور لحظياً من موبايلك بدون تطبيق ولا تسجيل.",
 };
 

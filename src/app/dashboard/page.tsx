@@ -1,6 +1,6 @@
 import Dashboard from "@/components/Dashboard";
 
-export const metadata = { title: "لوحة التحكم — راحتك", robots: { index: false } };
+export const metadata = { title: "لوحة التحكم — دوري", robots: { index: false } };
 
 export default function DashboardPage() {
   return (
