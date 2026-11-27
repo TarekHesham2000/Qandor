@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getOwnerSupabase } from "@/lib/supabase-owner";
 import SegDigits from "@/components/brand/SegDigits";
 import { toArabicError } from "@/lib/errors";
+import { COUNTRIES, DEFAULT_DIAL, buildPhone } from "@/lib/phone";
 import type { ControlState } from "@/lib/types";
 
 const POLL_MS = 15_000;
@@ -14,6 +15,7 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
   const [busy, setBusy] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [wName, setWName] = useState("");
+  const [wDial, setWDial] = useState(DEFAULT_DIAL);
   const [wPhone, setWPhone] = useState("");
   const [addMsg, setAddMsg] = useState<string | null>(null);
   // قفل محلي ضد الضغط المزدوج (السيرفر كمان بيقفل الصف، دي طبقة إضافية للتجربة)
@@ -59,7 +61,7 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
     const { data, error } = await getOwnerSupabase().rpc("queue_add_walkin", {
       p_queue_id: queueId,
       p_name: wName,
-      p_phone: wPhone,
+      p_phone: buildPhone(wDial, wPhone),
       p_control_token: token,
     });
     if (error) {
@@ -142,10 +144,20 @@ export default function ControlPanel({ queueId, token }: { queueId: string; toke
         {showAdd && (
           <form onSubmit={addWalkin} className="mt-3 space-y-2">
             <input value={wName} onChange={(e) => setWName(e.target.value)} maxLength={50} placeholder="الاسم (اختياري)" className="input" />
-            <input
-              type="tel" inputMode="tel" dir="ltr" value={wPhone} onChange={(e) => setWPhone(e.target.value)}
-              placeholder="الموبايل (اختياري، للتنبيه)" className="input text-right"
-            />
+            <div dir="ltr" className="flex gap-2">
+              <select
+                value={wDial} onChange={(e) => setWDial(e.target.value)} aria-label="كود الدولة"
+                className="input w-auto shrink-0"
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.iso} value={c.dial}>{c.name} {c.dial}</option>
+                ))}
+              </select>
+              <input
+                type="tel" inputMode="tel" dir="ltr" value={wPhone} onChange={(e) => setWPhone(e.target.value)}
+                placeholder="الموبايل (اختياري، للتنبيه)" className="input min-w-0 flex-1 text-right"
+              />
+            </div>
             <button disabled={busy} className="btn btn-ink w-full">أضف للطابور</button>
             {addMsg && <p role="status" className="rounded-xl bg-paper p-2 text-center text-sm">{addMsg}</p>}
           </form>
