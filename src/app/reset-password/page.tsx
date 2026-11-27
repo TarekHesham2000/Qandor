@@ -1,6 +1,6 @@
 import ResetPasswordForm from "@/components/ResetPasswordForm";
 
-export const metadata = { title: "باسوورد جديد — راحتك", robots: { index: false } };
+export const metadata = { title: "باسوورد جديد — دوري", robots: { index: false } };
 
 export default function ResetPasswordPage() {
   return (
