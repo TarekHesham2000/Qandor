@@ -5,6 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 import Logo from "@/components/brand/Logo";
 import SegDigits from "@/components/brand/SegDigits";
 import TicketCard, { type TicketPhase } from "@/components/ticket/TicketCard";
+import { whoFor } from "@/lib/who";
 import type { QueueBroadcast, TicketStatus } from "@/lib/types";
 
 // شبكة أمان: لو اتصال الـ Realtime وقع (موبايل/نت ضعيف) نسحب الحالة كل 20 ثانية
@@ -147,7 +148,7 @@ export default function TicketTracker({ token }: { token: string }) {
 
       {waiting && (
         <div className="flex items-center justify-between rounded-xl bg-ink px-5 py-3 text-led">
-          <span className="text-sm text-white/65">الحالي عند الحلاق</span>
+          <span className="text-sm text-white/65">{ticket.kind ? `الحالي عند ${whoFor(ticket.kind)}` : "الحالي دلوقتي"}</span>
           <span className="text-4xl"><SegDigits value={ticket.serving_no} digits={2} /></span>
         </div>
       )}

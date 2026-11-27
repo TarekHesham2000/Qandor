@@ -3,9 +3,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 let client: SupabaseClient | null = null;
 
 /**
- * عميل Supabase لصاحب النشاط (والحلاق): بيحتفظ بالجلسة في المتصفح.
+ * عميل Supabase لصاحب النشاط (والموظف): بيحتفظ بالجلسة في المتصفح.
  * منفصل عن عميل العميل المجهول عشان جلسة المالك ما تتسربش لصفحات الزبائن.
- * لو مفيش جلسة بيشتغل بصلاحية anon عادي، فصفحة الحلاق (لينك التحكم) بتستخدمه برضو.
+ * لو مفيش جلسة بيشتغل بصلاحية anon عادي، فصفحة الموظف (لينك التحكم) بتستخدمه برضو.
  */
 export function getOwnerSupabase(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -11,7 +11,7 @@ async function loadBusiness(slug: string): Promise<PublicBusiness | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) throw new Error("ENV_MISSING");
-  // Server Component: الـ HTML يوصل جاهز بأسماء الحلاقين → أسرع أول عرض و SEO أفضل
+  // Server Component: الـ HTML يوصل جاهز بأسماء الطوابير → أسرع أول عرض و SEO أفضل
   const supabase = createClient(url, key, { auth: { persistSession: false } });
   const { data, error } = await supabase.rpc("get_public_business", { p_slug: slug });
   if (error) throw new Error(error.message);
